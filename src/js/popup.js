@@ -1750,7 +1750,7 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
     Logic.setOrRemoveAssignment(tabId, fullURL, userContextId, false);
   },
 
-  checkurl(url){
+  checkUrl(url){
     // append "https://" if protocol not found
     const regexWww = /.*www\..*/g;
     const foundWww = url.match(regexWww);
