@@ -1751,7 +1751,7 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
     const tabId = currentTab.id;
     const fullURL = this.checkUrl(url);
 
-    if (fullURL !== "") {
+    if (fullURL !== null) {
       // Assign URL to container
       await Logic.setOrRemoveAssignment(tabId, fullURL, userContextId, false);
 
@@ -1773,7 +1773,7 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
     let newURL = url;
 
     if (!url.match(validUrl)) {
-      return "";
+      return null;
     }
 
     if (!url.match(regexhttp) && !url.match(regexhttps)) {
