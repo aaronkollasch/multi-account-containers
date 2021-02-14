@@ -277,12 +277,8 @@ const backgroundLogic = {
     return Promise.all(
       identities.map(async ({ cookieStoreId, color, icon, name }) => {
         const userContextId = this.getUserContextIdFromCookieStoreId(cookieStoreId);
-        const sitesByContainer = await assignManager.storageArea.getByContainer(userContextId);
-        const sites = Object.values(sitesByContainer).map(site => {
-          site = Object.assign({}, site); // create a copy
-          delete site.userContextId;
-          return site;
-        });
+        const sitesByContainer = await assignManager.storageArea.getAssignedSites(userContextId);
+        const sites = Object.values(sitesByContainer).map(({ neverAsk, hostname }) => ({ neverAsk, hostname }));
         return ({ color, icon, name, sites });
       })
     );
@@ -304,7 +300,6 @@ const backgroundLogic = {
             await assignManager.storageArea.set(pageUrl, data);
           }
         } catch (err) {
-          // TODO warn the user some associations of sites could not be recovered
         }
         return identity;
       } catch (err) {
@@ -322,6 +317,7 @@ const backgroundLogic = {
           }
         })
       );
+      throw new Error("Some containers creation failed");
     } else { // Importation succeed, remove old identities
       await Promise.all(
         backup.map(async (identity) => {
@@ -330,6 +326,7 @@ const backgroundLogic = {
         })
       );
     }
+    return created.length;
   },
 
   async queryIdentitiesState(windowId) {
