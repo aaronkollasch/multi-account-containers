@@ -1770,7 +1770,7 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
 
     // Add new site to current container
     const siteLink = document.querySelector("#edit-container-site-link");
-    Logic.addEnterHandler(siteLink, () => {
+    Utils.addEnterHandler(siteLink, () => {
       this._addSite();
     });
   },
@@ -1889,7 +1889,7 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
         trElement.getElementsByClassName("favicon")[0].appendChild(Utils.createFavIconElement(assumedUrl));
         const deleteButton = trElement.querySelector(".delete-assignment");
         const that = this;
-        Logic.addEnterHandler(deleteButton, async () => {
+        Utils.addEnterHandler(deleteButton, async () => {
           const userContextId = Logic.currentUserContextId();
           // Lets show the message to the current tab
           // TODO remove then when firefox supports arrow fn async
