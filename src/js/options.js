@@ -55,7 +55,9 @@ async function setupOptions() {
       reader.onloadend = async () => {
         try {
           const identitiesState = JSON.parse(reader.result);
-          const { created: restoredCount, incomplete } = await browser.runtime.sendMessage({
+          const {
+            created: restoredCount, removed: removedCount, incomplete
+          } = await browser.runtime.sendMessage({
             method: "restoreIdentitiesState",
             identities: identitiesState
           });
@@ -64,6 +66,10 @@ async function setupOptions() {
             restoreResult.style.color = "green";
           } else {
             restoreResult.textContent = `${restoredCount} containers restored, but some lost their site association (${incomplete.join(", ")}).`;
+            restoreResult.style.color = "orange";
+          }
+          if (removedCount) {
+            restoreResult.textContent += ` ${removedCount} containers removed.`;
             restoreResult.style.color = "orange";
           }
         } catch (err) {
