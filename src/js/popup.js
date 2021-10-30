@@ -1818,13 +1818,13 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
     const formValues = new FormData(this._editForm);
     const url = formValues.get("site-name");
     const userContextId = formValues.get("container-id");
-    const currentTab = await Logic.currentTab();
+    const currentTab = await Utils.currentTab();
     const tabId = currentTab.id;
     const baseURL = this.normalizeUrl(url);
 
     if (baseURL !== null) {
       // Assign URL to container
-      await Logic.setOrRemoveAssignment(tabId, baseURL, userContextId, false);
+      await Utils.setOrRemoveAssignment(tabId, baseURL, userContextId, false);
 
       // Clear form
       document.querySelector("#edit-container-panel-site-input").value = "";
@@ -1880,41 +1880,35 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
     const assignmentKeys = Object.keys(assignments);
     assignmentPanel.hidden = !(assignmentKeys.length > 0);
     if (assignments) {
-      const tableElement = assignmentPanel.querySelector(".assigned-sites-list");
+      const tableElement = document.querySelector("#edit-sites-assigned");
       /* Remove previous assignment list,
          after removing one we rerender the list */
       while (tableElement.firstChild) {
         tableElement.firstChild.remove();
       }
-
       assignmentKeys.forEach((siteKey) => {
         const site = assignments[siteKey];
-        const trElement = document.createElement("div");
+        const trElement = document.createElement("tr");
         /* As we don't have the full or correct path the best we can assume is the path is HTTPS and then replace with a broken icon later if it doesn't load.
            This is pending a better solution for favicons from web extensions */
         const assumedUrl = `https://${site.hostname}/favicon.ico`;
         trElement.innerHTML = Utils.escaped`
-        <div class="favicon"></div>
-        <div title="${site.hostname}" class="truncate-text hostname">
-          ${site.hostname}
-        </div>
-        <img
-          class="pop-button-image delete-assignment"
-          src="/img/container-delete.svg"
-        />`;
+        <td>
+          <div class="favicon"></div>
+          <span title="${site.hostname}" class="menu-text">${site.hostname}</span>
+          <img class="trash-button delete-assignment" src="/img/container-delete.svg" />
+        </td>`;
         trElement.getElementsByClassName("favicon")[0].appendChild(Utils.createFavIconElement(assumedUrl));
-        const deleteButton = trElement.querySelector(".delete-assignment");
-        const that = this;
+        const deleteButton = trElement.querySelector(".trash-button");
         Utils.addEnterHandler(deleteButton, async () => {
           const userContextId = Logic.currentUserContextId();
           // Lets show the message to the current tab
-          // TODO remove then when firefox supports arrow fn async
-          const currentTab = await Logic.currentTab();
-          Logic.setOrRemoveAssignment(currentTab.id, assumedUrl, userContextId, true);
+          // const currentTab = await Utils.currentTab();
+          Utils.setOrRemoveAssignment(false, assumedUrl, userContextId, true);
           delete assignments[siteKey];
-          that.showAssignedContainers(assignments);
+          this.showAssignedContainers(assignments);
         });
-        trElement.classList.add("container-info-tab-row", "clickable");
+        trElement.classList.add("menu-item", "hover-highlight", "keyboard-nav");
         tableElement.appendChild(trElement);
       });
     }
