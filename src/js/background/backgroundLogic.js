@@ -285,14 +285,27 @@ const backgroundLogic = {
   },
 
   async restoreIdentitiesState(identities) {
-    const backup = await browser.contextualIdentities.query({});
+    const oldIdentities = await browser.contextualIdentities.query({});
     const incomplete = [];
     let allSucceed = true;
+    let index = -1;
     const identitiesPromise = identities.map(async ({ color, icon, name, sites }) => {
       try {
         if (typeof color !== "string" || typeof icon !== "string" || typeof name !== "string" || !Array.isArray((sites)))
           throw new Error("Corrupted container backup");
-        const identity = await browser.contextualIdentities.create({ color, icon, name });
+
+        let make_new_identity = false;
+        let identity = null;
+        index = oldIdentities.map(
+          ({ color, icon, name }) => JSON.stringify({ color, icon, name })
+        ).indexOf(JSON.stringify({ color, icon, name }));
+        if (index > -1) {
+          identity = oldIdentities.splice(index, 1)[0];
+        }
+        else {
+          make_new_identity = true;
+          identity = await browser.contextualIdentities.create({ color, icon, name });
+        }
         try {
           await identityState.storageArea.get(identity.cookieStoreId);
           const userContextId = this.getUserContextIdFromCookieStoreId(identity.cookieStoreId);
@@ -308,7 +321,10 @@ const backgroundLogic = {
         } catch (err) {
           incomplete.push(name); // site association damaged
         }
-        return identity;
+        if (make_new_identity)
+          return identity;
+        else
+          return null;
       } catch (err) {
         allSucceed = false;
         return null;
@@ -318,22 +334,22 @@ const backgroundLogic = {
     if (!allSucceed) { // Importation failed, restore previous state
       await Promise.all(
         created.map(async (identityOrNull) => {
-          if (identityOrNull) {
-            await identityState.storageArea.remove(identityOrNull.cookieStoreId);
-            await browser.contextualIdentities.remove(identityOrNull.cookieStoreId);
-          }
+          await identityState.storageArea.remove(identityOrNull.cookieStoreId);
+          await browser.contextualIdentities.remove(identityOrNull.cookieStoreId);
+          await this.deleteContainer(identityOrNull.cookieStoreId, {removed: true});
         })
       );
       throw new Error("Some containers couldn't be created");
     } else { // Importation succeed, remove old identities
       await Promise.all(
-        backup.map(async (identity) => {
-          await identityState.storageArea.remove(identity.cookieStoreId);
-          await browser.contextualIdentities.remove(identity.cookieStoreId);
+        oldIdentities.map(async ({cookieStoreId}) => {
+          await identityState.storageArea.remove(cookieStoreId);
+          await browser.contextualIdentities.remove(cookieStoreId);
+          await this.deleteContainer(cookieStoreId, {removed: true});
         })
       );
     }
-    return { created: created.length, incomplete };
+    return { created: created.length, removed: oldIdentities.length, incomplete };
   },
 
   async queryIdentitiesState(windowId) {
