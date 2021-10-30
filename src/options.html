@@ -142,8 +142,18 @@
       <h3 data-i18n-message-id="onboarding"></h3>
       <button data-btn-id="reset-onboarding" data-i18n-message-id="resetOnboardingPanels"></button>
       <p><em data-i18n-message-id="onboardingToggle"></em></p>
-      <h3>Mozilla VPN</h3>
-      <button data-btn-id="moz-vpn-learn-more" data-i18n-message-id="learnMore"></button>
+      <fieldset>
+        <legend>Restore</legend>
+        <input id="containers-restore-input" type="file">
+        <p><strong>WARNING !</strong> This operation will erase current configuration with the imported one. All cookies will be discarded.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Save</legend>
+        <a id="containers-save-link" href="#" style="display: none;"></a>
+        <button id="containers-save-button">Backup</button>
+        <p>NOTE : Backup containers names, icons and colors, but <em>not</em> containers' cookies.</p>
+      </fieldset>
     </form>
     <script src="js/options.js"></script>
   </body>
