@@ -524,6 +524,7 @@ input:checked + .slider::before {
   transition: max-height 0.3s ease-in-out, padding-block-end 0.2s ease-in-out;
 
   /* max-block-size: 56px; */
+
   /* min-block-size: 56px; */
   box-shadow: 0 0 0 1px var(--hr-grey);
 }
@@ -1679,12 +1680,15 @@ input[type="text"]:focus {
 }
 
 #edit-container-site-link {
-  background: #ebebeb;
+  /* background: #ebebeb; */
   block-size: 36px;
+  padding-block: 10px;
+  text-align: center;
+  padding-inline: 10px;
 }
 
 #edit-container-site-link:hover {
-  background: #e3e3e3;
+  /* background: #e3e3e3; */
 }
 
 .edit-container-panel legend,
