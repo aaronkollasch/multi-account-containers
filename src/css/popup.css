@@ -524,7 +524,7 @@ input:checked + .slider::before {
   transition: max-height 0.3s ease-in-out, padding-block-end 0.2s ease-in-out;
 
   /* max-block-size: 56px; */
-  min-block-size: 56px;
+  /* min-block-size: 56px; */
   box-shadow: 0 0 0 1px var(--hr-grey);
 }
 
