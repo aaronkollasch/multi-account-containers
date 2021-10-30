@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "Firefox Multi-Account Containers",
+  "name": "Multi-Account Containers (aaronkollasch fork)",
   "version": "8.0.7",
   "incognito": "not_allowed",
   "description": "__MSG_extensionDescription__",
@@ -8,7 +8,13 @@
     "48": "img/container-site-d-48.png",
     "96": "img/container-site-d-96.png"
   },
-  "homepage_url": "https://github.com/mozilla/multi-account-containers#readme",
+  "applications": {
+    "gecko": {
+      "id": "@aaronk-containers",
+      "strict_min_version": "91.1.0"
+    }
+  },
+  "homepage_url": "https://github.com/aaronkollasch/multi-account-containers#readme",
   "permissions": [
     "<all_urls>",
     "activeTab",
@@ -22,7 +28,9 @@
     "unlimitedStorage",
     "tabs",
     "webRequestBlocking",
-    "webRequest"
+    "webRequest",
+    "proxy",
+    "devtools"
   ],
   "optional_permissions": [
     "bookmarks",
@@ -31,7 +39,7 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "@testpilot-containers",
+      "id": "@aaronk-containers",
       "strict_min_version": "91.1.0"
     }
   },
