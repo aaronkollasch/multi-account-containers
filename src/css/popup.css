@@ -1926,12 +1926,15 @@ input[type="text"]:focus {
 }
 
 #edit-container-site-link {
-  background: #ebebeb;
+  /* background: #ebebeb; */
   block-size: 36px;
+  padding-block: 10px;
+  text-align: center;
+  padding-inline: 10px;
 }
 
 #edit-container-site-link:hover {
-  background: #e3e3e3;
+  /* background: #e3e3e3; */
 }
 
 .edit-container-panel legend,
