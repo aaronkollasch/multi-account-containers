@@ -81,7 +81,7 @@ async function restoreContainers(event) {
     reader.onloadend = async () => {
       try {
         const identitiesState = JSON.parse(reader.result);
-        const { created: restoredCount, incomplete } = await browser.runtime.sendMessage({
+        const { created: restoredCount, removed: removedCount, incomplete } = await browser.runtime.sendMessage({
           method: "restoreIdentitiesState",
           identities: identitiesState
         });
@@ -90,6 +90,10 @@ async function restoreContainers(event) {
           restoreResult.style.color = "green";
         } else {
           restoreResult.textContent = browser.i18n.getMessage("containersPartiallyRestored", [String(restoredCount), String(incomplete.join(", "))]);
+          restoreResult.style.color = "orange";
+        }
+        if (removedCount) {
+          restoreResult.textContent += browser.i18n.getMessage("containersRemoved", [String(removedCount)]);
           restoreResult.style.color = "orange";
         }
       } catch (err) {
