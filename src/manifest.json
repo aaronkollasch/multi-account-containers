@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Multi-Account Containers (aaronkollasch fork)",
-  "version": "8.0.3",
+  "version": "8.0.7",
   "incognito": "not_allowed",
   "description": "__MSG_extensionDescription__",
   "icons": {
@@ -18,17 +18,17 @@
     "history",
     "idle",
     "management",
-    "nativeMessaging",
     "storage",
     "unlimitedStorage",
     "tabs",
     "webRequestBlocking",
     "webRequest",
-    "proxy",
     "devtools"
   ],
   "optional_permissions": [
-    "bookmarks"
+    "bookmarks",
+    "nativeMessaging",
+    "proxy"
   ],
   "browser_specific_settings": {
     "gecko": {

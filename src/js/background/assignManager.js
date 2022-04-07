@@ -188,21 +188,21 @@ window.assignManager = {
     // The following blocks potentially dangerous requests for privacy that come without a tabId
 
     if(requestInfo.tabId === -1) {
-      return {type: "direct"};
+      return {};
     }
 
     const tab = await browser.tabs.get(requestInfo.tabId);
     const result = await proxifiedContainers.retrieve(tab.cookieStoreId);
     if (!result || !result.proxy) {
-      return {type: "direct"};
+      return {};
     }
 
     if (!result.proxy.mozProxyEnabled) {
-      return result.proxy;
+      return { ...result.proxy, proxyDNS: true };
     }
 
     // Let's add the isolation key.
-    return [{ ...result.proxy, connectionIsolationKey: "" + MozillaVPN_Background.isolationKey }];
+    return [{ ...result.proxy, connectionIsolationKey: "" + MozillaVPN_Background.isolationKey, proxyDNS: true }];
   },
 
   // Before a request is handled by the browser we decide if we should
@@ -382,6 +382,12 @@ window.assignManager = {
     return currentContainerState && currentContainerState.isIsolated;
   },
 
+  maybeAddProxyListeners() {
+    if (browser.proxy) {
+      browser.proxy.onRequest.addListener(this.handleProxifiedRequest, {urls: ["<all_urls>"]});
+    }
+  },
+
   init() {
     browser.contextMenus.onClicked.addListener((info, tab) => {
       info.bookmarkId ?
@@ -390,7 +396,7 @@ window.assignManager = {
     });
 
     // Before anything happens we decide if the request should be proxified
-    browser.proxy.onRequest.addListener(this.handleProxifiedRequest, {urls: ["<all_urls>"]});
+    this.maybeAddProxyListeners();
 
     // Before a request is handled by the browser we decide if we should
     // route through a different container
