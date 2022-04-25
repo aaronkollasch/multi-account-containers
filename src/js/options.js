@@ -62,7 +62,9 @@ async function setupOptions() {
       const content = JSON.stringify(
         await browser.runtime.sendMessage({
           method: "backupIdentitiesState"
-        })
+        }),
+        null,
+        2
       );
       backupLink.href = `data:application/json;base64,${btoa(content)}`;
       backupLink.download = `containers-backup-${(new Date()).toISOString()}.json`;
