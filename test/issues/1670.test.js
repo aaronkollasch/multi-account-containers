@@ -43,7 +43,7 @@ describe("#1670", function () {
         console.log("TRACE 5.5.1.0");
         await this.webExt.popup.helper.clickElementById("manage-containers-link");
         console.log("TRACE 5.5.1.1");
-        await this.webExt.popup.helper.clickElementByQuerySelectorAll(".edit-container-icon", "last");
+        await this.webExt.popup.helper.clickElementByQuerySelectorAll(".usercontext-icon", "last");
         console.log("TRACE 5.5.1.2");
         this.webExt.popup.window.document.getElementById("edit-container-panel-site-input").value = exampleUrl;
         console.log("TRACE 5.5.1.3");
@@ -67,7 +67,7 @@ describe("#1670", function () {
         console.log("TRACE 5.7.1.0");
         await this.webExt.popup.helper.clickElementById("manage-containers-link");
         console.log("TRACE 5.7.1.1");
-        await this.webExt.popup.helper.clickElementByQuerySelectorAll(".edit-container-icon", "last");
+        await this.webExt.popup.helper.clickElementByQuerySelectorAll(".usercontext-icon", "last");
         console.log("TRACE 5.7.1.2");
         this.webExt.popup.window.document.getElementById("edit-container-panel-site-input").value = exampleUrl;
         console.log("TRACE 5.7.1.3");
@@ -91,7 +91,7 @@ describe("#1670", function () {
         console.log("TRACE 5.9.1.0");
         await this.webExt.popup.helper.clickElementById("manage-containers-link");
         console.log("TRACE 5.9.1.1");
-        await this.webExt.popup.helper.clickElementByQuerySelectorAll(".edit-container-icon", "last");
+        await this.webExt.popup.helper.clickElementByQuerySelectorAll(".usercontext-icon", "last");
         console.log("TRACE 5.9.1.2");
         this.webExt.popup.window.document.getElementById("edit-container-panel-site-input").value = exampleUrl;
         console.log("TRACE 5.9.1.3");
@@ -115,7 +115,7 @@ describe("#1670", function () {
         console.log("TRACE 5.11.1.0");
         await this.webExt.popup.helper.clickElementById("manage-containers-link");
         console.log("TRACE 5.11.1.1");
-        await this.webExt.popup.helper.clickElementByQuerySelectorAll(".edit-container-icon", "last");
+        await this.webExt.popup.helper.clickElementByQuerySelectorAll(".usercontext-icon", "last");
         console.log("TRACE 5.11.1.2");
         this.webExt.popup.window.document.getElementById("edit-container-panel-site-input").value = exampleUrl;
         console.log("TRACE 5.11.1.3");
