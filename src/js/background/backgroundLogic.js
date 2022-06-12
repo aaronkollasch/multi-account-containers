@@ -278,9 +278,21 @@ const backgroundLogic = {
     return Promise.all(
       identities.map(async ({ cookieStoreId, color, icon, name }) => {
         const userContextId = this.getUserContextIdFromCookieStoreId(cookieStoreId);
-        const sitesByContainer = await assignManager.storageArea.getAssignedSites(userContextId);
+        const [
+          { isIsolated },
+          sitesByContainer
+        ] = await Promise.all([
+          identityState.storageArea.get(cookieStoreId),
+          assignManager.storageArea.getAssignedSites(userContextId)
+        ]);
         const sites = Object.values(sitesByContainer).map(({ neverAsk, hostname }) => ({ neverAsk, hostname }));
-        return ({ color, icon, name, sites });
+        return ({
+          color,
+          icon,
+          name,
+          isolated: isIsolated && true, // either `true` or `undefined`
+          sites
+        });
       })
     );
   },
@@ -290,9 +302,15 @@ const backgroundLogic = {
     const incomplete = [];
     let allSucceed = true;
     let index = -1;
-    const identitiesPromise = identities.map(async ({ color, icon, name, sites }) => {
+    const identitiesPromise = identities.map(async ({ color, icon, name, isolated, sites }) => {
       try {
-        if (typeof color !== "string" || typeof icon !== "string" || typeof name !== "string" || !Array.isArray((sites)))
+        if (
+          typeof color !== "string" ||
+          typeof icon !== "string" ||
+          typeof name !== "string" ||
+          (isolated !== true && isolated !== undefined) ||
+          !Array.isArray((sites))
+        )
           throw new Error("Corrupted container backup");
 
         let make_new_identity = false;
@@ -308,7 +326,7 @@ const backgroundLogic = {
           identity = await browser.contextualIdentities.create({ color, icon, name });
         }
         try {
-          await identityState.storageArea.get(identity.cookieStoreId);
+          await identityState.storageArea.get(identity.cookieStoreId); // to create identity state
           const userContextId = this.getUserContextIdFromCookieStoreId(identity.cookieStoreId);
           for (const { neverAsk, hostname } of sites) {
             if (typeof neverAsk !== "boolean" || typeof hostname !== "string" || hostname === "")
@@ -319,6 +337,8 @@ const backgroundLogic = {
               userContextId
             });
           }
+          if (isolated)
+            await identityState.storageArea.set(identity.cookieStoreId, { isIsolated: "locked" });
         } catch (err) {
           incomplete.push(name); // site association damaged
         }
@@ -331,6 +351,7 @@ const backgroundLogic = {
         return null;
       }
     });
+
     const created = await Promise.all(identitiesPromise);
     if (!allSucceed) { // Importation failed, restore previous state
       await Promise.all(
