@@ -366,9 +366,11 @@ const backgroundLogic = {
     if (!allSucceed) { // Importation failed, restore previous state
       await Promise.all(
         created.map(async (identityOrNull) => {
-          await identityState.storageArea.remove(identityOrNull.cookieStoreId);
-          await browser.contextualIdentities.remove(identityOrNull.cookieStoreId);
-          await this.deleteContainer(identityOrNull.cookieStoreId, {removed: true});
+          if (identityOrNull) {
+            await identityState.storageArea.remove(identityOrNull.cookieStoreId);
+            await browser.contextualIdentities.remove(identityOrNull.cookieStoreId);
+            await this.deleteContainer(identityOrNull.cookieStoreId, {removed: true});
+          }
         })
       );
       throw new Error("Some containers couldn't be created");
