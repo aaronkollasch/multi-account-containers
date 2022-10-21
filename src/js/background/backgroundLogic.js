@@ -274,7 +274,12 @@ const backgroundLogic = {
   },
 
   async backupIdentitiesState() {
-    const identities = await browser.contextualIdentities.query({});
+    const [identities, containerOrderStorage] = await Promise.all([
+      browser.contextualIdentities.query({}),
+      browser.storage.local.get([CONTAINER_ORDER_STORAGE_KEY])
+    ]);
+    const containerOrder =
+      containerOrderStorage && containerOrderStorage[CONTAINER_ORDER_STORAGE_KEY];
     return Promise.all(
       identities.map(async ({ cookieStoreId, color, icon, name }) => {
         const userContextId = this.getUserContextIdFromCookieStoreId(cookieStoreId);
@@ -286,10 +291,12 @@ const backgroundLogic = {
           assignManager.storageArea.getAssignedSites(userContextId)
         ]);
         const sites = Object.values(sitesByContainer).map(({ neverAsk, hostname }) => ({ neverAsk, hostname }));
+        const order = containerOrder && containerOrder[cookieStoreId];
         return ({
           color,
           icon,
           name,
+          order,
           isolated: isIsolated && true, // either `true` or `undefined`
           sites
         });
@@ -300,9 +307,10 @@ const backgroundLogic = {
   async restoreIdentitiesState(identities) {
     const oldIdentities = await browser.contextualIdentities.query({});
     const incomplete = [];
+    const containerOrder = {};
     let allSucceed = true;
     let index = -1;
-    const identitiesPromise = identities.map(async ({ color, icon, name, isolated, sites }) => {
+    const identitiesPromise = identities.map(async ({ color, icon, name, order, isolated, sites }) => {
       try {
         if (
           typeof color !== "string" ||
@@ -342,6 +350,8 @@ const backgroundLogic = {
         } catch (err) {
           incomplete.push(name); // site association damaged
         }
+        if (typeof order === "number")
+          containerOrder[identity.cookieStoreId] = order;
         if (make_new_identity)
           return identity;
         else
@@ -370,6 +380,12 @@ const backgroundLogic = {
           await this.deleteContainer(cookieStoreId, {removed: true});
         })
       );
+      if (Object.keys(containerOrder).length > 0)
+        await browser.storage.local.set({
+          [CONTAINER_ORDER_STORAGE_KEY]: containerOrder
+        });
+      else
+        await browser.storage.local.remove([CONTAINER_ORDER_STORAGE_KEY]);
     }
     return { created: created.length, removed: oldIdentities.length, incomplete };
   },
