@@ -1,5 +1,4 @@
 .DS_Store
-package-lock.json
 node_modules
 README.html
 *.xpi
@@ -9,6 +8,7 @@ README.html
 addon.env
 
 src/web-ext-artifacts/*
+web-ext-artifacts
 
 # JetBrains IDE files
 .idea
